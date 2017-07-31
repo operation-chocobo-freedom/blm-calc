@@ -1,3 +1,7 @@
+const free = _ => {
+    return 0;
+};
+
 const astralCast = baseCastTime => {
     return state => {
         if (state.element === 'ice' && state.stacks === 3) {
@@ -94,6 +98,7 @@ const umbralPotency = basePotency => {
 
 export default {
     fire1: {
+        type: 'gcd',
         name: "Fire",
         cast: astralCast(2.4),
         recast: 2.4,
@@ -114,6 +119,7 @@ export default {
         }
     },
     fire3: {
+        type: 'gcd',
         name: "Fire 3",
         cast: astralCast(3.3),
         recast: 2.4,
@@ -126,6 +132,7 @@ export default {
         }
     },
     blizzard3: {
+        type: 'gcd',
         name: "Blizzard 3",
         cast: umbralCast(3.3),
         recast: 2.4,
@@ -134,6 +141,16 @@ export default {
         mutate: state => {
             state.element = 'ice';
             state.stacks  = 3;
+            return state;
+        }
+    },
+    enochian: {
+        type: 'ogcd',
+        name: "Enochian",
+        cooldown: 30,
+        mp: free,
+        potency: free,
+        mutate: state => {
             return state;
         }
     }

@@ -11,7 +11,21 @@
                         </div>
                     </div>
                 </div>
-                <div class="column"></div>
+                <div class="column">
+                    <div class="field">
+                        <label class="label">Show MP as Percentage</label>
+                        <div class="control">
+                            <label class="radio">
+                                <input type="radio" name="question" :value="true" v-model="flags.mpPercentage">
+                                Yes
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="question" :value="false" v-model="flags.mpPercentage">
+                                No
+                            </label>
+                        </div>
+                    </div>
+                </div>
                 <div class="column"></div>
             </div>
 
@@ -56,7 +70,12 @@
                             <spellcast :spell="spell"></spellcast>
                         </td>
                         <td class="">
-                            {{ calculated[index].potency.toFixed() }}
+                            <span v-if="calculated[index].potency === 0">
+
+                            </span>
+                            <span v-if="calculated[index].potency !== 0">
+                                {{ calculated[index].potency.toFixed() }}
+                            </span>
                         </td>
                         <td class="">
                             <template v-if="calculated[index].state.element === 'fire'">
@@ -67,7 +86,8 @@
                             </template>
                         </td>
                         <td>
-                            <small>{{calculated[index].cast}}s</small>
+                            <small v-if="calculated[index].type === 'gcd'">{{calculated[index].cast}}s</small>
+                            <small v-if="calculated[index].type === 'ogcd'">-</small>
                         </td>
                         <td class="">
                             <small v-if="flags.mpPercentage">{{ ((calculated[index].mp / stats.mp) * 100).toFixed(2) }}%</small>
@@ -125,17 +145,32 @@
                 let state   = {element: 'none', stacks: 0};
                 let mp      = this.stats.mp;
                 let results = [];
-                let damage, cast, snapshot;
                 for (let spell of this.queue) {
-                    mp -= spells[spell].mp(state);
-                    snapshot       = {
-                        spell: spell,
-                        mp: mp,
-                        cast: spells[spell].cast(state),
-                        recast: spells[spell].recast,
-                        potency: spells[spell].potency(state),
-                    };
-                    state          = spells[spell].mutate(Object.assign({}, state));
+                    let snapshot = {};
+                    let data = spells[spell];
+
+                    if (data.type === 'gcd') {
+                        mp -= data.mp(state);
+                        snapshot = {
+                            type: 'gcd',
+                            spell: spell,
+                            mp: mp,
+                            cast: data.cast(state),
+                            recast: data.recast,
+                            potency: data.potency(state),
+                        };
+                    } else if (data.type === 'ogcd') {
+                        snapshot = {
+                            type: 'ogcd',
+                            spell: spell,
+                            mp: mp,
+                            cast: 'weave',
+                            recast: data.recast,
+                            potency: data.potency(state),
+                        }
+                    }
+
+                    state          = data.mutate(Object.assign({}, state));
                     snapshot.state = Object.assign({}, state);
                     results.push(snapshot);
                 }
@@ -147,7 +182,10 @@
                 }, 0).toFixed(2);
             },
             totalDuration () {
-                return this.calculated.reduce((sum, spellcast) => {
+                return this.calculated.filter(snapshot => {
+                    // limit to only GCDs
+                    return snapshot.type === 'gcd';
+                }).reduce((sum, spellcast) => {
                     return sum + spellcast.cast + spellcast.recast;
                 }, 0).toFixed(2);
             },
