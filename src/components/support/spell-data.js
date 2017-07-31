@@ -149,6 +149,27 @@ export default {
             return state;
         }
     },
+    blizzard1: {
+        type: 'gcd',
+        name: "Blizzard",
+        cast: umbralCast(2.4),
+        recast: recast,
+        mp: umbralMana(960),
+        potency: umbralPotency(180),
+        mutate: state => {
+            if (state.element === 'ice') {
+                state.stacks++;
+                if (state.stacks > 3) state.stacks = 3;
+            } else if (state.element === 'fire') {
+                state.element = 'none';
+                state.stacks  = 0;
+            } else {
+                state.element = 'ice';
+                state.stacks  = 1;
+            }
+            return state;
+        }
+    },
     blizzard3: {
         type: 'gcd',
         name: "Blizzard 3",

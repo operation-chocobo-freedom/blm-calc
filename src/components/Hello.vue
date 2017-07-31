@@ -40,6 +40,7 @@
                     Drag here to delete.
                 </draggable>
             </div>
+            <a class="button is-danger" @click="clear()">Clear</a>
 
 
             <table class="table is-fullwidth">
@@ -102,6 +103,9 @@
                             </td>
                         </tr>
                     </template>
+                    <tr v-if="queue.length === 0">
+                    <td colspan="500" class="empty-queue"><em>Build your rotation here! Drag spells from the box above.</em></td>
+                    </tr>
                 </draggable>
             </table>
 
@@ -211,6 +215,9 @@
         methods: {
             emptyTrash () {
                 this.trash = [];
+            },
+            clear () {
+                this.queue = [];
             }
         },
         components: {
@@ -222,6 +229,12 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+
+    .empty-queue {
+        padding: 2rem 0;
+        text-align: center;
+    }
+
     .spell-handle {
     }
 

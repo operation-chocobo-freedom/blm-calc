@@ -5,10 +5,10 @@ Black mages are hard.
 - ~~Add Enochian~~
 - ~~Add F4/B4 + validation when no enochian~~
 - ~~Add Umbral Hearts~~
-- Add Blizzard 1
+- ~~Add Blizzard 1~~
 - Add Foul + Foul Timer
 - Add Convert
-- Add Transpose
+- ~~Add Transpose~~
 - Add Leylines
 - Add Thunder & DoT Support
 - Add Flare
