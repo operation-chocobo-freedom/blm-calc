@@ -151,6 +151,7 @@ export default {
         mp: free,
         potency: free,
         mutate: state => {
+            state.enochian = true;
             return state;
         }
     }

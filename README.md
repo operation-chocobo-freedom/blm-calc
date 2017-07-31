@@ -1,21 +1,22 @@
-# calc
+Black mages are hard.
 
-> Because math is hard
+# TODO
 
-## Build Setup
-
-``` bash
-# install dependencies
-npm install
-
-# serve with hot reload at localhost:8080
-npm run dev
-
-# build for production with minification
-npm run build
-
-# build for production and view the bundle analyzer report
-npm run build --report
-```
-
-For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+- Add Enochian
+- Add F4/B4
+- Add Umbral Hearts
+- Add Foul + Foul Timer
+- Add Convert
+- Add Transpose
+- Add Leylines
+- Add Thunder & DoT Support
+- Add Flare
+- Simulate MP regeneration
+- Simulate fire/ice dropoff
+- Add foul clipping warnings
+- Add 2x weaving clipping warnings
+- Add warnings when MP will be lacking
+- Add shortcuts to quickly add spells to list
+- Add shortcut to quickly delete spells
+- Select/multi-select spells and duplicate them
+- URL-based saving

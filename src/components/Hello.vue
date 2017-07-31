@@ -78,11 +78,12 @@
                             </span>
                         </td>
                         <td class="">
+                            <enochian v-if="calculated[index].state.enochian"></enochian>
                             <template v-if="calculated[index].state.element === 'fire'">
-                                <div v-for="i in calculated[index].state.stacks" class="stack stack-fire"></div>
+                                <aspect-stack element="fire" :count="calculated[index].state.stacks"></aspect-stack>
                             </template>
                             <template v-if="calculated[index].state.element === 'ice'">
-                                <div v-for="i in calculated[index].state.stacks" class="stack stack-ice"></div>
+                                <aspect-stack element="ice" :count="calculated[index].state.stacks"></aspect-stack>
                             </template>
                         </td>
                         <td>
@@ -110,6 +111,8 @@
 <script>
     var _ = require('lodash');
     import spellcast from './Spellcast.vue';
+    import aspectStack from './AspectStack.vue';
+    import enochian from './Enochian.vue';
     import spells from './support/spell-data';
     import draggable from 'vuedraggable'
     export default {
@@ -117,7 +120,7 @@
             return {
                 palette: Object.keys(spells),
                 spells: spells,
-                queue: ['fire1', 'fire3', 'fire1', 'fire1', 'fire1', 'blizzard3', 'fire3', 'fire1', 'fire1'],
+                queue: ['blizzard3', 'fire3', 'fire1'],
                 trash: [],
                 stats: {
                     mp: 15480,
@@ -130,7 +133,7 @@
                     handle: '.spellcast'
                 },
                 paletteOptions: {
-                    group: {name: 'rotation', pull: 'clone'},
+                    group: {name: 'rotation', pull: 'clone', put: false},
                     sort: false,
                     handle: '.spellcast'
                 },
@@ -142,7 +145,7 @@
         },
         computed: {
             calculated () {
-                let state   = {element: 'none', stacks: 0};
+                let state   = {element: 'none', stacks: 0, enochian: false};
                 let mp      = this.stats.mp;
                 let results = [];
                 for (let spell of this.queue) {
@@ -199,7 +202,7 @@
             }
         },
         components: {
-            spellcast, draggable
+            spellcast, draggable, "aspect-stack": aspectStack, enochian
         }
     }
 
