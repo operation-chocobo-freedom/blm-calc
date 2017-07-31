@@ -16,10 +16,21 @@
             </div>
 
 
+            <div class="notification">
+                <draggable v-model="palette" :options="paletteOptions">
+                    <spellcast v-for="spell in palette" :key="spell" :spell="spell"></spellcast>
+                </draggable>
+            </div>
+            <div class="notification">
+                <draggable v-model="trash" :options="trashOptions" @add="emptyTrash()">
+                    Drag here to delete.
+                </draggable>
+            </div>
+
+
             <table class="table is-fullwidth">
                 <thead>
                 <tr>
-                    <th></th>
                     <th></th>
                     <th>Potency</th>
                     <th>Astral / Umbral</th>
@@ -33,17 +44,15 @@
                 <tfoot>
                 <tr>
                     <th></th>
-                    <th></th>
                     <th>Potency</th>
                     <th>Astral / Umbral</th>
                     <th>Cast</th>
                     <th>MP</th>
                 </tr>
                 </tfoot>
-                <draggable v-model="queue" :options="{group:'people'}" @start="drag=true" @end="drag=false" :element="'tbody'">
+                <draggable v-model="queue" :options="sortableOptions" :element="'tbody'" >
                     <tr v-for="(spell, index) in queue">
-                        <td>{{ index }}</td>
-                        <td class="">
+                        <td class="spell-handle">
                             <spellcast :spell="spell"></spellcast>
                         </td>
                         <td class="">
@@ -79,19 +88,35 @@
 </template>
 
 <script>
+    var _ = require('lodash');
     import spellcast from './Spellcast.vue';
     import spells from './support/spell-data';
     import draggable from 'vuedraggable'
     export default {
         data () {
             return {
+                palette: Object.keys(spells),
                 spells: spells,
                 queue: ['fire1', 'fire3', 'fire1', 'fire1', 'fire1', 'blizzard3', 'fire3', 'fire1', 'fire1'],
+                trash: [],
                 stats: {
                     mp: 15480,
                 },
                 flags: {
                     mpPercentage: false,
+                },
+                sortableOptions: {
+                    group: {name: 'rotation'},
+                    handle: '.spellcast'
+                },
+                paletteOptions: {
+                    group: {name: 'rotation', pull: 'clone'},
+                    sort: false,
+                    handle: '.spellcast'
+                },
+                trashOptions: {
+                    group: {name: 'rotation'},
+
                 }
             }
         },
@@ -130,6 +155,11 @@
                 return (this.totalPotency / this.totalDuration).toFixed(4);
             },
         },
+        methods: {
+            emptyTrash () {
+                this.trash = [];
+            }
+        },
         components: {
             spellcast, draggable
         }
@@ -139,6 +169,10 @@
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+    .spell-handle {
+
+    }
+
     .stack {
         display: inline-block;
         position: relative;
@@ -204,29 +238,4 @@
         border-right: 6px solid transparent;
     }
 
-    .gu-mirror {
-        position: fixed !important;
-        margin: 0 !important;
-        z-index: 9999 !important;
-        opacity: 0.8;
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
-        filter: alpha(opacity=80);
-    }
-
-    .gu-hide {
-        display: none !important;
-    }
-
-    .gu-unselectable {
-        -webkit-user-select: none !important;
-        -moz-user-select: none !important;
-        -ms-user-select: none !important;
-        user-select: none !important;
-    }
-
-    .gu-transit {
-        opacity: 0.2;
-        -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";
-        filter: alpha(opacity=20);
-    }
 </style>

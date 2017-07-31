@@ -1,5 +1,5 @@
 <template>
-    <div style="position: relative;">
+    <div class="spellcast" style="position: relative;">
         <img :src="icon" alt="" class="spell-icon">
         <span class="spell-name">
             {{ spells[spell].name }}
@@ -27,6 +27,10 @@ export default {
 </script>
 
 <style scoped>
+    .spellcast {
+        cursor: move;
+    }
+
     .spell-icon {
         display: inline-block;
         height: 1.2rem;
