@@ -16,7 +16,6 @@
             </div>
 
 
-
             <table class="table is-fullwidth">
                 <thead>
                 <tr>
@@ -26,9 +25,8 @@
                     <th>Astral / Umbral</th>
                     <th>Cast</th>
                     <th>
-                        MP
-                        <span @click="flags.mpPercentage = true">%</span>
-                        <span @click="flags.mpPercentage = false">pt</span>
+                        MP <span @click="flags.mpPercentage = true">%</span> <span
+                            @click="flags.mpPercentage = false">pt</span>
                     </th>
                 </tr>
                 </thead>
@@ -42,46 +40,39 @@
                     <th>MP</th>
                 </tr>
                 </tfoot>
-
-                <tbody v-dragula="queue" drake="first">
-                <tr v-for="(spell, index) in queue" :key="index">
-                    <td>{{ index }}</td>
-                    <td class="">
-                        <spellcast :spell="spell"></spellcast>
-                    </td>
-                    <td class="">
-                        {{ calculated[index].potency }}
-                    </td>
-                    <td class="">
-                        <template v-if="calculated[index].state.element === 'fire'">
-                            <div v-for="i in calculated[index].state.stacks" class="stack stack-fire"></div>
-                        </template>
-                        <template v-if="calculated[index].state.element === 'ice'">
-                            <div v-for="i in calculated[index].state.stacks" class="stack stack-ice"></div>
-                        </template>
-                    </td>
-                    <td><small>{{calculated[index].cast}}s</small></td>
-                    <td class="">
-                        <small v-if="flags.mpPercentage">{{ ((calculated[index].mp / stats.mp) * 100).toFixed(2) }}%</small>
-                        <small v-if="!flags.mpPercentage">{{ calculated[index].mp }} MP</small>
-                        <span v-if="calculated[index].state.element === 'ice'" class="up"></span>
-                    </td>
-                </tr>
-                </tbody>
+                <draggable v-model="queue" :options="{group:'people'}" @start="drag=true" @end="drag=false" :element="'tbody'">
+                    <tr v-for="(spell, index) in queue">
+                        <td>{{ index }}</td>
+                        <td class="">
+                            <spellcast :spell="spell"></spellcast>
+                        </td>
+                        <td class="">
+                            {{ calculated[index].potency.toFixed() }}
+                        </td>
+                        <td class="">
+                            <template v-if="calculated[index].state.element === 'fire'">
+                                <div v-for="i in calculated[index].state.stacks" class="stack stack-fire"></div>
+                            </template>
+                            <template v-if="calculated[index].state.element === 'ice'">
+                                <div v-for="i in calculated[index].state.stacks" class="stack stack-ice"></div>
+                            </template>
+                        </td>
+                        <td>
+                            <small>{{calculated[index].cast}}s</small>
+                        </td>
+                        <td class="">
+                            <small v-if="flags.mpPercentage">{{ ((calculated[index].mp / stats.mp) * 100).toFixed(2) }}%</small>
+                            <small v-if="!flags.mpPercentage">{{ calculated[index].mp }} MP</small>
+                            <span v-if="calculated[index].state.element === 'ice'" class="up"></span>
+                        </td>
+                    </tr>
+                </draggable>
             </table>
 
             <div class="content">
                 <h1>{{ potencyPerSecond }} p/s</h1>
                 <p>
-                    {{ totalPotency }} Potency over {{ totalDuration }} Seconds
-                </p>
-            </div>
-
-            <div class="notification">
-                {{ queue }}
-            </div>
-            <div class="notification">
-                {{ calculated }}
+                    {{ totalPotency }} Potency over {{ totalDuration }} Seconds </p>
             </div>
         </div>
     </div>
@@ -90,6 +81,7 @@
 <script>
     import spellcast from './Spellcast.vue';
     import spells from './support/spell-data';
+    import draggable from 'vuedraggable'
     export default {
         data () {
             return {
@@ -139,7 +131,7 @@
             },
         },
         components: {
-            spellcast
+            spellcast, draggable
         }
     }
 
@@ -220,15 +212,18 @@
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=80)";
         filter: alpha(opacity=80);
     }
+
     .gu-hide {
         display: none !important;
     }
+
     .gu-unselectable {
         -webkit-user-select: none !important;
         -moz-user-select: none !important;
         -ms-user-select: none !important;
         user-select: none !important;
     }
+
     .gu-transit {
         opacity: 0.2;
         -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=20)";

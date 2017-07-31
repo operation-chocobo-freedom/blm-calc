@@ -7,13 +7,6 @@ import { Vue2Dragula } from 'vue2-dragula'
 
 Vue.config.productionTip = false
 
-
-Vue.use(Vue2Dragula, {
-    logging: {
-        service: true
-    }
-});
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',

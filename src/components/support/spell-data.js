@@ -52,7 +52,7 @@ const astralPotency = basePotency => {
 
 const umbralCast = baseCastTime => {
     return state => {
-        if (state.element === 'ice' && state.stacks === 3) {
+        if (state.element === 'fire' && state.stacks === 3) {
             return baseCastTime / 2;
         } else {
             return baseCastTime;
