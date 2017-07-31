@@ -4,18 +4,23 @@
         <span class="spell-name">
             {{ spells[spell].name }}
         </span>
+        <span v-if="warning">&mdash; <span class="warning">{{ warning }}</span></span>
     </div>
 </template>
 
 <script>
 import spells from './support/spell-data';
 export default {
-    props: [
-        'spell'
-    ],
+    props: {
+        'spell': String,
+        'warning': {
+            type: String,
+            default: ''
+        }
+    },
     data () {
         return {
-            spells: spells,
+            spells: spells
         }
     },
     computed: {
@@ -45,5 +50,13 @@ export default {
         font-size: 0.8rem;
         position: relative;
         top: -1px;
+    }
+
+    .warning {
+        font-size: 0.8em;
+        position: relative;
+        top: -1px;
+        color: #c00;
+        font-weight: bold;
     }
 </style>

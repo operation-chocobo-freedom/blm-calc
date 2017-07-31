@@ -47,55 +47,61 @@
                 <tr>
                     <th></th>
                     <th>Potency</th>
-                    <th>Astral / Umbral</th>
+                    <th>Stacks</th>
                     <th>Cast</th>
-                    <th>
-                        MP <span @click="flags.mpPercentage = true">%</span> <span
-                            @click="flags.mpPercentage = false">pt</span>
-                    </th>
+                    <th>MP</th>
                 </tr>
                 </thead>
                 <tfoot>
                 <tr>
                     <th></th>
                     <th>Potency</th>
-                    <th>Astral / Umbral</th>
+                    <th>Stacks</th>
                     <th>Cast</th>
                     <th>MP</th>
                 </tr>
                 </tfoot>
                 <draggable v-model="queue" :options="sortableOptions" :element="'tbody'" >
-                    <tr v-for="(spell, index) in queue">
-                        <td class="spell-handle">
-                            <spellcast :spell="spell"></spellcast>
-                        </td>
-                        <td class="">
-                            <span v-if="calculated[index].potency === 0">
+                    <template v-for="(spell, index) in queue">
+                        <tr :class="{warning: calculated[index].warning}">
+                            <td class="spell-handle">
+                                <spellcast :spell="spell" :warning="calculated[index].warning"></spellcast>
+                            </td>
+                            <td class="">
+                                <span v-if="calculated[index].potency === 0">
 
-                            </span>
-                            <span v-if="calculated[index].potency !== 0">
-                                {{ calculated[index].potency.toFixed() }}
-                            </span>
-                        </td>
-                        <td class="">
-                            <enochian v-if="calculated[index].state.enochian"></enochian>
-                            <template v-if="calculated[index].state.element === 'fire'">
-                                <aspect-stack element="fire" :count="calculated[index].state.stacks"></aspect-stack>
-                            </template>
-                            <template v-if="calculated[index].state.element === 'ice'">
-                                <aspect-stack element="ice" :count="calculated[index].state.stacks"></aspect-stack>
-                            </template>
-                        </td>
-                        <td>
-                            <small v-if="calculated[index].type === 'gcd'">{{calculated[index].cast}}s</small>
-                            <small v-if="calculated[index].type === 'ogcd'">-</small>
-                        </td>
-                        <td class="">
-                            <small v-if="flags.mpPercentage">{{ ((calculated[index].mp / stats.mp) * 100).toFixed(2) }}%</small>
-                            <small v-if="!flags.mpPercentage">{{ calculated[index].mp }} MP</small>
-                            <span v-if="calculated[index].state.element === 'ice'" class="up"></span>
-                        </td>
-                    </tr>
+                                </span>
+                                <span v-if="calculated[index].potency !== 0">
+                                    {{ calculated[index].potency.toFixed() }}
+                                </span>
+                            </td>
+                            <td class="">
+                                <enochian :state="calculated[index].state.enochian"></enochian>
+                                <template v-if="calculated[index].state.element === 'fire'">
+                                    <aspect-stack element="fire" :count="calculated[index].state.stacks"></aspect-stack>
+                                </template>
+                                <template v-if="calculated[index].state.element === 'ice'">
+                                    <aspect-stack element="ice" :count="calculated[index].state.stacks"></aspect-stack>
+                                </template>
+                                <umbral-heart :count="calculated[index].state.umbralHearts"></umbral-heart>
+
+                            </td>
+                            <td>
+                                <small v-if="calculated[index].type === 'gcd'">{{calculated[index].cast}}s</small>
+                                <small v-if="calculated[index].type === 'ogcd'"></small>
+                            </td>
+                            <td class="">
+                                <span v-if="calculated[index].state.element === 'ice'" class="up"></span>
+
+                                <small v-if="flags.mpPercentage">{{ ((calculated[index].mp / stats.mp) * 100).toFixed(2) }}%</small>
+                                <small v-if="!flags.mpPercentage">{{ calculated[index].mp }}</small>
+
+                                <small class="mp-delta mp-increase" v-if="calculated[index].mpChange > 0">+ {{calculated[index].mpChange}}</small>
+                                <small class="mp-delta mp-decrease" v-if="calculated[index].mpChange < 0">{{calculated[index].mpChange}}</small>
+
+                            </td>
+                        </tr>
+                    </template>
                 </draggable>
             </table>
 
@@ -113,6 +119,7 @@
     import spellcast from './Spellcast.vue';
     import aspectStack from './AspectStack.vue';
     import enochian from './Enochian.vue';
+    import umbralHeart from './UmbralHeart.vue';
     import spells from './support/spell-data';
     import draggable from 'vuedraggable'
     export default {
@@ -120,7 +127,7 @@
             return {
                 palette: Object.keys(spells),
                 spells: spells,
-                queue: ['blizzard3', 'fire3', 'fire1'],
+                queue: ['blizzard3', 'enochian', 'blizzard4', 'fire3', 'fire4', 'fire4', 'fire4', 'fire4', 'fire1'],
                 trash: [],
                 stats: {
                     mp: 15480,
@@ -153,24 +160,29 @@
                     let data = spells[spell];
 
                     if (data.type === 'gcd') {
+                        let originalMp = mp;
                         mp -= data.mp(state);
                         snapshot = {
                             type: 'gcd',
                             spell: spell,
                             mp: mp,
+                            mpChange: mp - originalMp,
                             cast: data.cast(state),
                             recast: data.recast,
                             potency: data.potency(state),
+                            warning: data.validate ? data.validate(state) : '',
                         };
                     } else if (data.type === 'ogcd') {
                         snapshot = {
                             type: 'ogcd',
                             spell: spell,
                             mp: mp,
+                            mpChange: 0,
                             cast: 'weave',
                             recast: data.recast,
                             potency: data.potency(state),
-                        }
+                            warning: data.validate ? data.validate(state) : '',
+                        };
                     }
 
                     state          = data.mutate(Object.assign({}, state));
@@ -202,7 +214,7 @@
             }
         },
         components: {
-            spellcast, draggable, "aspect-stack": aspectStack, enochian
+            spellcast, draggable, "aspect-stack": aspectStack, enochian, "umbral-heart": umbralHeart,
         }
     }
 
@@ -211,63 +223,28 @@
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
     .spell-handle {
-
     }
 
-    .stack {
-        display: inline-block;
+    .warning {
+        background: #fdd;
+    }
+    .warning:hover {
+        background: #faa;
+    }
+
+    .mp-delta {
+        font-size: 0.6rem;
         position: relative;
-        margin: 0 5px 0 0;
-        width: 16px;
-        height: 9.24px;
+        top: -1px;
+        font-weight: bold;
     }
 
-    .stack-ice {
-        background-color: #64C7CC;
+    .mp-increase {
+        color: #070;
     }
 
-    .stack-ice:before,
-    .stack-ice:after {
-        content: "";
-        position: absolute;
-        width: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-    }
-
-    .stack-ice:before {
-        bottom: 100%;
-        border-bottom: 4.62px solid #64C7CC;
-    }
-
-    .stack-ice:after {
-        top: 100%;
-        width: 0;
-        border-top: 4.62px solid #64C7CC;
-    }
-
-    .stack-fire {
-        background-color: #c12a51;
-    }
-
-    .stack-fire:before,
-    .stack-fire:after {
-        content: "";
-        position: absolute;
-        width: 0;
-        border-left: 8px solid transparent;
-        border-right: 8px solid transparent;
-    }
-
-    .stack-fire:before {
-        bottom: 100%;
-        border-bottom: 4.62px solid #c12a51;
-    }
-
-    .stack-fire:after {
-        top: 100%;
-        width: 0;
-        border-top: 4.62px solid #c12a51;
+    .mp-decrease {
+        color: #700;
     }
 
     .up {
@@ -278,5 +255,4 @@
         border-left: 6px solid transparent;
         border-right: 6px solid transparent;
     }
-
 </style>

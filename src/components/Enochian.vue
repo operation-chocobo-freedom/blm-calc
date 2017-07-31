@@ -1,28 +1,26 @@
 <template>
-    <div class="stack stack-ice"></div>
+    <div class="enochian" :class="{active: state}"></div>
 </template>
 
 <script>
     export default {
+        props: ['state']
     }
 </script>
 
 <style scoped>
 
-    .stack {
+    .enochian {
         display: inline-block;
         position: relative;
         margin: 0 5px 0 0;
         width: 16px;
         height: 9.24px;
+        background-color: #e9dbff;
     }
 
-    .stack-ice {
-        background-color: #a675ef;
-    }
-
-    .stack-ice:before,
-    .stack-ice:after {
+    .enochian:before,
+    .enochian:after {
         content: "";
         position: absolute;
         width: 0;
@@ -30,14 +28,24 @@
         border-right: 8px solid transparent;
     }
 
-    .stack-ice:before {
+    .enochian:before {
         bottom: 100%;
-        border-bottom: 4.62px solid #a675ef;
+        border-bottom: 4.62px solid #e9dbff;
     }
 
-    .stack-ice:after {
+    .enochian:after {
         top: 100%;
         width: 0;
-        border-top: 4.62px solid #a675ef;
+        border-top: 4.62px solid #e9dbff;
+    }
+
+    .active {
+        background-color: #a675ef;
+    }
+    .active::before {
+        border-bottom-color: #a675ef;
+    }
+    .active::after {
+        border-top-color: #a675ef;
     }
 </style>

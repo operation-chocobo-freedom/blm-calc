@@ -12,10 +12,17 @@ const astralCast = baseCastTime => {
     }
 };
 
+let expendNextUmbralHeart = false;
 const astralMana = baseMana => {
     return state => {
+        expendNextUmbralHeart = false;
         if (state.element === 'fire') {
-            return baseMana * 2;
+            if (state.umbralHearts) {
+                expendNextUmbralHeart = true;
+                return baseMana;
+            } else {
+                return baseMana * 2;
+            }
         } else if (state.element === 'ice') {
             if (state.stacks === 1) {
                 return baseMana / 2;
@@ -95,16 +102,26 @@ const umbralPotency = basePotency => {
     }
 };
 
+function checkUmbralHeartMutate (state) {
+    if (expendNextUmbralHeart) {
+        --state.umbralHearts;
+    }
+    expendNextUmbralHeart = false;
+}
+
+
+let recast = 2.4;
 
 export default {
     fire1: {
         type: 'gcd',
         name: "Fire",
         cast: astralCast(2.4),
-        recast: 2.4,
+        recast: recast,
         mp: astralMana(1200),
         potency: astralPotency(180),
         mutate: state => {
+            checkUmbralHeartMutate(state);
             if (state.element === 'fire') {
                 state.stacks++;
                 if (state.stacks > 3) state.stacks = 3;
@@ -122,10 +139,11 @@ export default {
         type: 'gcd',
         name: "Fire 3",
         cast: astralCast(3.3),
-        recast: 2.4,
+        recast: recast,
         mp: astralMana(2400),
         potency: astralPotency(240),
         mutate: state => {
+            checkUmbralHeartMutate(state);
             state.element = 'fire';
             state.stacks  = 3;
             return state;
@@ -135,7 +153,7 @@ export default {
         type: 'gcd',
         name: "Blizzard 3",
         cast: umbralCast(3.3),
-        recast: 2.4,
+        recast: recast,
         mp: umbralMana(1440),
         potency: umbralPotency(240),
         mutate: state => {
@@ -153,7 +171,60 @@ export default {
         mutate: state => {
             state.enochian = true;
             return state;
+        },
+        validate: state => {
+            return state.element === 'none' ? 'Requires astral/umbral state' : '';
         }
-    }
+    },
+    transpose: {
+        type: 'ogcd',
+        name: "Transpose",
+        cooldown: 12,
+        mp: free,
+        potency: free,
+        mutate: state => {
+            if (state.element === 'fire'){
+                state.element = 'ice';
+                state.stacks = 1;
+            } else if (state.element === 'ice') {
+                state.element = 'fire';
+                state.stacks = 1;
+            }
+            return state;
+        },
+        validate: state => {
+            return state.element === 'none' ? 'Has no effect with no aspected state' : '';
+        }
+    },
+    fire4: {
+        type: 'gcd',
+        name: "Fire 4",
+        cast: astralCast(2.8),
+        recast: recast,
+        mp: astralMana(1200),
+        potency: astralPotency(260),
+        mutate: state => {
+            checkUmbralHeartMutate(state);
+            return state;
+        },
+        validate: state => {
+            return state.element !== 'fire' || state.enochian !== true  ? 'Requires astral + enochian' : '';
+        }
+    },
+    blizzard4: {
+        type: 'gcd',
+        name: "Blizzard 4",
+        cast: umbralCast(2.8),
+        recast: recast,
+        mp: umbralMana(1440),
+        potency: umbralPotency(260),
+        mutate: state => {
+            state.umbralHearts = 3;
+            return state;
+        },
+        validate: state => {
+            return state.element !== 'ice' || state.enochian !== true  ? 'Requires umbral + enochian' : '';
+        }
+    },
 }
 
