@@ -29,18 +29,27 @@
                 <div class="column"></div>
             </div>
 
+            <div class="columns">
+                <div class="column">
+                    <div class="notification">
+                        <draggable v-model="palette" :options="paletteOptions">
+                            <spellcast v-for="spell in palette" :key="spell" :spell="spell"></spellcast>
+                        </draggable>
+                    </div>
+                </div>
+                <div class="column">
+                    <div class="notification">
+                        <draggable v-model="trash" :options="trashOptions" @add="emptyTrash()">
+                            <p class="trashbag">
+                                Drag here to delete.
+                            </p>
+                        </draggable>
+                    </div>
+                    <a class="button is-danger" @click="clear()">Clear All</a>
 
-            <div class="notification">
-                <draggable v-model="palette" :options="paletteOptions">
-                    <spellcast v-for="spell in palette" :key="spell" :spell="spell"></spellcast>
-                </draggable>
+                </div>
             </div>
-            <div class="notification">
-                <draggable v-model="trash" :options="trashOptions" @add="emptyTrash()">
-                    Drag here to delete.
-                </draggable>
-            </div>
-            <a class="button is-danger" @click="clear()">Clear</a>
+
 
 
             <table class="table is-fullwidth">
@@ -247,6 +256,11 @@
 
     .empty-queue {
         padding: 2rem 0;
+        text-align: center;
+    }
+
+    .trashbag {
+        padding: 60px;
         text-align: center;
     }
 
