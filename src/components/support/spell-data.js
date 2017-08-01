@@ -13,7 +13,7 @@ const astralCast = baseCastTime => {
 };
 
 let expendNextUmbralHeart = false;
-const astralMana = baseMana => {
+const astralMana          = baseMana => {
     return state => {
         expendNextUmbralHeart = false;
         if (state.element === 'fire') {
@@ -102,7 +102,7 @@ const umbralPotency = basePotency => {
     }
 };
 
-function checkUmbralHeartMutate (state) {
+function checkUmbralHeartMutate(state) {
     if (expendNextUmbralHeart) {
         --state.umbralHearts;
     }
@@ -110,7 +110,7 @@ function checkUmbralHeartMutate (state) {
 }
 
 let aspectTimer = 13;
-let recast = 2.4;
+let recast      = 2.4;
 
 export default {
     fire1: {
@@ -127,12 +127,12 @@ export default {
                 if (state.stacks > 3) state.stacks = 3;
                 state.aspectTimer = aspectTimer;
             } else if (state.element === 'ice') {
-                state.element = 'none';
-                state.stacks  = 0;
+                state.element     = 'none';
+                state.stacks      = 0;
                 state.aspectTimer = 0;
             } else {
-                state.element = 'fire';
-                state.stacks  = 1;
+                state.element     = 'fire';
+                state.stacks      = 1;
                 state.aspectTimer = aspectTimer;
             }
             return state;
@@ -147,8 +147,8 @@ export default {
         potency: astralPotency(240),
         mutate: state => {
             checkUmbralHeartMutate(state);
-            state.element = 'fire';
-            state.stacks  = 3;
+            state.element     = 'fire';
+            state.stacks      = 3;
             state.aspectTimer = aspectTimer;
             return state;
         }
@@ -166,12 +166,12 @@ export default {
                 state.aspectTimer = aspectTimer;
                 if (state.stacks > 3) state.stacks = 3;
             } else if (state.element === 'fire') {
-                state.element = 'none';
-                state.stacks  = 0;
+                state.element     = 'none';
+                state.stacks      = 0;
                 state.aspectTimer = 0;
             } else {
-                state.element = 'ice';
-                state.stacks  = 1;
+                state.element     = 'ice';
+                state.stacks      = 1;
                 state.aspectTimer = aspectTimer;
             }
             return state;
@@ -185,8 +185,8 @@ export default {
         mp: umbralMana(1440),
         potency: umbralPotency(240),
         mutate: state => {
-            state.element = 'ice';
-            state.stacks  = 3;
+            state.element     = 'ice';
+            state.stacks      = 3;
             state.aspectTimer = aspectTimer;
             return state;
         }
@@ -212,12 +212,14 @@ export default {
         mp: free,
         potency: free,
         mutate: state => {
-            if (state.element === 'fire'){
-                state.element = 'ice';
-                state.stacks = 1;
+            if (state.element === 'fire') {
+                state.element     = 'ice';
+                state.stacks      = 1;
+                state.aspectTimer = aspectTimer;
             } else if (state.element === 'ice') {
                 state.element = 'fire';
-                state.stacks = 1;
+                state.stacks  = 1;
+                state.aspectTimer = aspectTimer;
             }
             return state;
         },
@@ -232,7 +234,6 @@ export default {
         mp: free,
         potency: free,
         mutate: state => {
-            console.log(state.maxMp);
             state.mp += state.maxMp * 0.3;
             return state;
         }
@@ -249,7 +250,7 @@ export default {
             return state;
         },
         validate: state => {
-            return state.element !== 'fire' || state.enochian !== true  ? 'Requires astral + enochian' : '';
+            return state.element !== 'fire' || state.enochian !== true ? 'Requires astral + enochian' : '';
         }
     },
     blizzard4: {
@@ -264,7 +265,7 @@ export default {
             return state;
         },
         validate: state => {
-            return state.element !== 'ice' || state.enochian !== true  ? 'Requires umbral + enochian' : '';
+            return state.element !== 'ice' || state.enochian !== true ? 'Requires umbral + enochian' : '';
         }
     },
 }

@@ -17,12 +17,9 @@
                         <div class="control">
                             <label class="radio">
                                 <input type="radio" name="question" :value="true" v-model="flags.mpPercentage">
-                                Yes
-                            </label>
-                            <label class="radio">
-                                <input type="radio" name="question" :value="false" v-model="flags.mpPercentage">
-                                No
-                            </label>
+                                Yes </label> <label class="radio">
+                            <input type="radio" name="question" :value="false" v-model="flags.mpPercentage">
+                            No </label>
                         </div>
                     </div>
                 </div>
@@ -38,6 +35,9 @@
                     </div>
                 </div>
                 <div class="column">
+                    <div class="notification is-notice">
+                        <a class="button is-danger" @click="clear()">Clear All</a>
+                    </div>
                     <div class="notification">
                         <draggable v-model="trash" :options="trashOptions" @add="emptyTrash()">
                             <p class="trashbag">
@@ -45,11 +45,9 @@
                             </p>
                         </draggable>
                     </div>
-                    <a class="button is-danger" @click="clear()">Clear All</a>
 
                 </div>
             </div>
-
 
 
             <table class="table is-fullwidth">
@@ -71,7 +69,7 @@
                     <th>MP</th>
                 </tr>
                 </tfoot>
-                <draggable v-model="queue" :options="sortableOptions" :element="'tbody'" >
+                <draggable v-model="queue" :options="sortableOptions" :element="'tbody'">
                     <template v-for="(spell, index) in queue">
                         <tr :class="{warning: calculated[index].warning}">
                             <td class="spell-handle">
@@ -80,18 +78,19 @@
                             <td class="">
                                 <span v-if="calculated[index].potency === 0">
 
-                                </span>
-                                <span v-if="calculated[index].potency !== 0">
+                                </span> <span v-if="calculated[index].potency !== 0">
                                     {{ calculated[index].potency.toFixed() }}
                                 </span>
                             </td>
                             <td class="">
                                 <enochian :state="calculated[index].state.enochian"></enochian>
                                 <template v-if="calculated[index].state.element === 'fire'">
-                                    <aspect-stack element="fire" :count="calculated[index].state.stacks" :timer="calculated[index].state.aspectTimer"></aspect-stack>
+                                    <aspect-stack element="fire" :count="calculated[index].state.stacks"
+                                                  :timer="calculated[index].state.aspectTimer"></aspect-stack>
                                 </template>
                                 <template v-if="calculated[index].state.element === 'ice'">
-                                    <aspect-stack element="ice" :count="calculated[index].state.stacks" :timer="calculated[index].state.aspectTimer"></aspect-stack>
+                                    <aspect-stack element="ice" :count="calculated[index].state.stacks"
+                                                  :timer="calculated[index].state.aspectTimer"></aspect-stack>
                                 </template>
                                 <umbral-heart :count="calculated[index].state.umbralHearts"></umbral-heart>
 
@@ -106,14 +105,19 @@
                                 <small v-if="flags.mpPercentage">{{ ((calculated[index].state.mp / stats.mp) * 100).toFixed(2) }}%</small>
                                 <small v-if="!flags.mpPercentage">{{ calculated[index].state.mp }}</small>
 
-                                <small class="mp-delta mp-increase" v-if="calculated[index].mpChange > 0">+ {{calculated[index].mpChange}}</small>
-                                <small class="mp-delta mp-decrease" v-if="calculated[index].mpChange < 0">{{calculated[index].mpChange}}</small>
+                                <small class="mp-delta mp-increase"
+                                       v-if="calculated[index].mpChange > 0">+ {{calculated[index].mpChange}}
+                                </small>
+                                <small class="mp-delta mp-decrease"
+                                       v-if="calculated[index].mpChange < 0">{{calculated[index].mpChange}}
+                                </small>
 
                             </td>
                         </tr>
                     </template>
                     <tr v-if="queue.length === 0">
-                    <td colspan="500" class="empty-queue"><em>Build your rotation here! Drag spells from the box above.</em></td>
+                        <td colspan="500" class="empty-queue">
+                            <em>Build your rotation here! Drag spells from the box above.</em></td>
                     </tr>
                 </draggable>
             </table>
@@ -169,20 +173,20 @@
                 let results = [];
                 for (let spell of this.queue) {
                     let snapshot = {};
-                    let data = spells[spell];
+                    let data     = spells[spell];
                     // clone state
-                    state = Object.assign({}, state);
+                    state        = Object.assign({}, state);
 
                     // handle stack changes before cast completes
                     if (data.cast && state.aspectTimer < data.cast(state)) {
                         state.aspectTimer = 0;
-                        state.element = 'none';
-                        state.enochian = false;
+                        state.element     = 'none';
+                        state.enochian    = false;
                     }
 
                     // track mana use
                     let previousMp = state.mp;
-                    state.mp = state.mp - (data.mp ? data.mp(state) : 0);
+                    state.mp       = state.mp - (data.mp ? data.mp(state) : 0);
 
                     if (data.type === 'gcd') {
 
@@ -212,9 +216,9 @@
                             warning: data.validate ? data.validate(state) : '',
                         };
                     }
-                    state = data.mutate(state);
+                    state             = data.mutate(state);
                     snapshot.mpChange = state.mp - previousMp;
-                    snapshot.state = Object.assign({}, state);
+                    snapshot.state    = Object.assign({}, state);
                     results.push(snapshot);
                 }
                 return results;
@@ -270,6 +274,7 @@
     .warning {
         background: #fdd;
     }
+
     .warning:hover {
         background: #faa;
     }
