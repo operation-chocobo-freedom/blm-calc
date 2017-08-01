@@ -79,10 +79,10 @@
                             <td class="">
                                 <enochian :state="calculated[index].state.enochian"></enochian>
                                 <template v-if="calculated[index].state.element === 'fire'">
-                                    <aspect-stack element="fire" :count="calculated[index].state.stacks"></aspect-stack>
+                                    <aspect-stack element="fire" :count="calculated[index].state.stacks" :timer="calculated[index].state.aspectTimer"></aspect-stack>
                                 </template>
                                 <template v-if="calculated[index].state.element === 'ice'">
-                                    <aspect-stack element="ice" :count="calculated[index].state.stacks"></aspect-stack>
+                                    <aspect-stack element="ice" :count="calculated[index].state.stacks" :timer="calculated[index].state.aspectTimer"></aspect-stack>
                                 </template>
                                 <umbral-heart :count="calculated[index].state.umbralHearts"></umbral-heart>
 
@@ -94,8 +94,8 @@
                             <td class="">
                                 <span v-if="calculated[index].state.element === 'ice'" class="up"></span>
 
-                                <small v-if="flags.mpPercentage">{{ ((calculated[index].mp / stats.mp) * 100).toFixed(2) }}%</small>
-                                <small v-if="!flags.mpPercentage">{{ calculated[index].mp }}</small>
+                                <small v-if="flags.mpPercentage">{{ ((calculated[index].state.mp / stats.mp) * 100).toFixed(2) }}%</small>
+                                <small v-if="!flags.mpPercentage">{{ calculated[index].state.mp }}</small>
 
                                 <small class="mp-delta mp-increase" v-if="calculated[index].mpChange > 0">+ {{calculated[index].mpChange}}</small>
                                 <small class="mp-delta mp-decrease" v-if="calculated[index].mpChange < 0">{{calculated[index].mpChange}}</small>
@@ -156,40 +156,55 @@
         },
         computed: {
             calculated () {
-                let state   = {element: 'none', stacks: 0, enochian: false};
-                let mp      = this.stats.mp;
+                let state   = {element: 'none', stacks: 0, enochian: false, mp: this.stats.mp, maxMp: this.stats.mp};
                 let results = [];
                 for (let spell of this.queue) {
                     let snapshot = {};
                     let data = spells[spell];
+                    // clone state
+                    state = Object.assign({}, state);
+
+                    // handle stack changes before cast completes
+                    if (data.cast && state.aspectTimer < data.cast(state)) {
+                        state.aspectTimer = 0;
+                        state.element = 'none';
+                        state.enochian = false;
+                    }
+
+                    // track mana use
+                    let previousMp = state.mp;
+                    state.mp = state.mp - (data.mp ? data.mp(state) : 0);
 
                     if (data.type === 'gcd') {
-                        let originalMp = mp;
-                        mp -= data.mp(state);
+
                         snapshot = {
                             type: 'gcd',
                             spell: spell,
-                            mp: mp,
-                            mpChange: mp - originalMp,
                             cast: data.cast(state),
                             recast: data.recast,
                             potency: data.potency(state),
                             warning: data.validate ? data.validate(state) : '',
                         };
+
+                        // handle stacks
+                        if (state.aspectTimer > 0) {
+                            state.aspectTimer -= _.max([snapshot.cast, snapshot.recast]);
+                            if (state.aspectTimer < 0) {
+                                state.aspectTimer = 0;
+                            }
+                        }
                     } else if (data.type === 'ogcd') {
                         snapshot = {
                             type: 'ogcd',
                             spell: spell,
-                            mp: mp,
-                            mpChange: 0,
                             cast: 'weave',
                             recast: data.recast,
                             potency: data.potency(state),
                             warning: data.validate ? data.validate(state) : '',
                         };
                     }
-
-                    state          = data.mutate(Object.assign({}, state));
+                    state = data.mutate(state);
+                    snapshot.mpChange = state.mp - previousMp;
                     snapshot.state = Object.assign({}, state);
                     results.push(snapshot);
                 }

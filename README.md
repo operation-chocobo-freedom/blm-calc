@@ -7,13 +7,15 @@ Black mages are hard.
 - ~~Add Umbral Hearts~~
 - ~~Add Blizzard 1~~
 - Add Foul + Foul Timer
-- Add Convert
+- ~~Add Convert~~
 - ~~Add Transpose~~
 - Add Leylines
 - Add Thunder & DoT Support
+- Add Sharpcast
 - Add Flare
+- Simulate buff cooldowns
 - Simulate MP regeneration
-- Simulate fire/ice dropoff
+- ~~Simulate fire/ice dropoff~~
 - Add foul clipping warnings
 - Add 2x weaving clipping warnings
 - Add warnings when MP will be lacking

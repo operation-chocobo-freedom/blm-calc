@@ -4,12 +4,13 @@
         <div class="ice-diamond" v-if="element === 'ice'" v-for="n in (3 - count)"></div>
         <div class="fire-diamond active" v-if="element === 'fire'" v-for="n in count"></div>
         <div class="fire-diamond" v-if="element === 'fire'" v-for="n in (3 - count)"></div>
+        <small class="timer">{{ timer.toFixed(1) }}</small>
     </span>
 </template>
 
 <script>
     export default {
-        props: ['element', 'count']
+        props: ['element', 'count', 'timer']
     }
 </script>
 
@@ -36,5 +37,12 @@
 
     .active {
         opacity: 1;
+    }
+
+    .timer {
+        display: inline-block;
+        width: 30px;
+        font-weight: bold;
+        font-size: 0.7rem;
     }
 </style>

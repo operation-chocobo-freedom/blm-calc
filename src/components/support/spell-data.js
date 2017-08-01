@@ -109,7 +109,7 @@ function checkUmbralHeartMutate (state) {
     expendNextUmbralHeart = false;
 }
 
-
+let aspectTimer = 13;
 let recast = 2.4;
 
 export default {
@@ -125,12 +125,15 @@ export default {
             if (state.element === 'fire') {
                 state.stacks++;
                 if (state.stacks > 3) state.stacks = 3;
+                state.aspectTimer = aspectTimer;
             } else if (state.element === 'ice') {
                 state.element = 'none';
                 state.stacks  = 0;
+                state.aspectTimer = 0;
             } else {
                 state.element = 'fire';
                 state.stacks  = 1;
+                state.aspectTimer = aspectTimer;
             }
             return state;
         }
@@ -146,6 +149,7 @@ export default {
             checkUmbralHeartMutate(state);
             state.element = 'fire';
             state.stacks  = 3;
+            state.aspectTimer = aspectTimer;
             return state;
         }
     },
@@ -159,13 +163,16 @@ export default {
         mutate: state => {
             if (state.element === 'ice') {
                 state.stacks++;
+                state.aspectTimer = aspectTimer;
                 if (state.stacks > 3) state.stacks = 3;
             } else if (state.element === 'fire') {
                 state.element = 'none';
                 state.stacks  = 0;
+                state.aspectTimer = 0;
             } else {
                 state.element = 'ice';
                 state.stacks  = 1;
+                state.aspectTimer = aspectTimer;
             }
             return state;
         }
@@ -180,6 +187,7 @@ export default {
         mutate: state => {
             state.element = 'ice';
             state.stacks  = 3;
+            state.aspectTimer = aspectTimer;
             return state;
         }
     },
@@ -215,6 +223,18 @@ export default {
         },
         validate: state => {
             return state.element === 'none' ? 'Has no effect with no aspected state' : '';
+        }
+    },
+    convert: {
+        type: 'ogcd',
+        name: "Convert",
+        cooldown: 180,
+        mp: free,
+        potency: free,
+        mutate: state => {
+            console.log(state.maxMp);
+            state.mp += state.maxMp * 0.3;
+            return state;
         }
     },
     fire4: {
